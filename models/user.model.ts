@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -7,17 +7,15 @@ export interface IUser extends Document {
   email: string;
   password: string;
   avatar?: string;
+  followers: Types.ObjectId[];
+  following: Types.ObjectId[];
   comparePassword(candidatePassword: string): Promise<boolean>;
   generateToken(): string;
 }
 
 const userSchema = new Schema<IUser>(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    name: { type: String, required: true, trim: true },
     email: {
       type: String,
       required: true,
@@ -25,14 +23,23 @@ const userSchema = new Schema<IUser>(
       lowercase: true,
       trim: true,
     },
-    password: {
-      type: String,
-      required: true,
-    },
-    avatar: {
-      type: String,
-      default: "", 
-    },
+    password: { type: String, required: true },
+    avatar: { type: String, default: "" },
+
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
   },
   { timestamps: true }
 );
