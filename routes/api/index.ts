@@ -1,10 +1,9 @@
 import express, { Router, Request, Response } from "express";
+import userRoutes from "./user.router";
 
 const apiRoutes: Router = express.Router();
 
-apiRoutes.get("/", (req,res)=>{
-  res.send("Working")
-})
+apiRoutes.use("/auth", userRoutes)
 
 
 
