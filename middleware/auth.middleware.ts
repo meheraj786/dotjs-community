@@ -12,13 +12,13 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    const token = req.cookies?.token;
+    const token = await req.cookies?.token;
+    console.log(req);
     if (!token) return res.status(401).json({ message: "Not authorized" });
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "secret"
-    ) as { id: string; email: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret") as {
+      id: string;
+      email: string;
+    };
 
     const user = await User.findById(decoded.id).select("-password");
     if (!user) return res.status(401).json({ message: "User not found" });
@@ -27,6 +27,6 @@ export const authMiddleware = async (
     next();
   } catch (err) {
     console.error(err);
-    res.status(401).json({ message: "Not authorized" });
+    res.status(401).json({ message: "Something Wrong" });
   }
 };

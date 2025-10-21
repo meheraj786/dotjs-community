@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import User, { IUser } from "../models/user.model";
 import { Types } from "mongoose";
+import { log } from "node:console";
 
 interface AuthRequest extends Request {
   user?: IUser & { _id: Types.ObjectId };
@@ -60,7 +61,7 @@ export const login = async (req: AuthRequest, res: Response) => {
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
+    console.log(token);
     res.json({
       user: {
         id: user._id,
