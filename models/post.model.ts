@@ -27,37 +27,27 @@ const postSchema = new Schema<IPost>(
       required: true,
       trim: true,
     },
-    codeBlock: {
-      type: String,
-      default: "",
-    },
+    codeBlock: String,
     tags: {
       type: [String],
       default: [],
     },
-    image: {
-      type: String,
-      default: "",
-    },
+    image: String,
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    likes: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        default: [],
-      },
-    ],
-    comments: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Comment",
-        default: [],
-      },
-    ],
+    likes: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
+    comments: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Comment",
+      default: [],
+    },
   },
   { timestamps: true }
 );

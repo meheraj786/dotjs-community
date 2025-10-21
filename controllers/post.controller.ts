@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Types } from "mongoose";
-import Post from "../models/post.model";
+import Post, { IPost } from "../models/post.model";
 
 interface AuthRequest extends Request {
   user?: { _id: Types.ObjectId; following: Types.ObjectId[] };
@@ -21,7 +21,6 @@ export const createPost = async (req: AuthRequest, res: Response) => {
     });
 
     await post.save();
-
     res.status(201).json(post);
   } catch (err) {
     console.error(err);
@@ -39,11 +38,8 @@ export const getPosts = async (req: AuthRequest, res: Response) => {
 
     if (type === "following") {
       matchCondition = { author: { $in: followingIds } };
-    } else if (type === "all") {
-      // all posts
-      matchCondition = {};
     } else {
-      matchCondition = { author: { $in: followingIds } };
+      matchCondition = {}; // all posts
     }
 
     const posts = await Post.aggregate([
@@ -86,10 +82,13 @@ export const likePost = async (req: AuthRequest, res: Response) => {
     const postId = req.params.id;
     const currentUserId = req.user!._id;
 
-    const post = await Post.findById(postId);
+    const post = (await Post.findById(postId)) as IPost;
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    const index = post.likes.findIndex((id) => id.equals(currentUserId));
+    const index = post.likes.findIndex((id) =>
+      (id as Types.ObjectId).equals(currentUserId)
+    );
+
     if (index === -1) {
       post.likes.push(currentUserId);
     } else {
