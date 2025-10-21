@@ -32,14 +32,14 @@ export const getPosts = async (req: AuthRequest, res: Response) => {
   try {
     const currentUser = req.user!;
     const type = req.query.type as string;
-    const followingIds = currentUser.following;
+    const followingIds = currentUser?.following;
 
     let matchCondition = {};
 
     if (type === "following") {
       matchCondition = { author: { $in: followingIds } };
     } else {
-      matchCondition = {}; // all posts
+      matchCondition = {}; 
     }
 
     const posts = await Post.aggregate([

@@ -15,10 +15,9 @@ import {
 
 const commentRoutes: Router = express.Router();
 
-commentRoutes.post("/create", authMiddleware, createPost);
 commentRoutes.get("/comment/:id", getComment);
-commentRoutes.patch("/update-comment/:id", updateComment);
-commentRoutes.delete("/delete-comment/:id", deleteComment);
+commentRoutes.patch("/update-comment/:id", authMiddleware, updateComment);
+commentRoutes.delete("/delete-comment/:id", authMiddleware, deleteComment);
 commentRoutes.post("/like/:id", authMiddleware, likeComment);
 commentRoutes.get("/commentbypost/:id", authMiddleware, likeComment);
 
