@@ -29,6 +29,8 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 };
 
 export const getPosts = async (req: AuthRequest, res: Response) => {
+  console.log(req.ip);
+  
   try {
     const currentUser = req.user!;
     const type = req.query.type as string;

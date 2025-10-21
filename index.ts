@@ -13,6 +13,7 @@ console.log();
 
 (async () => {
   try {
+    app.set("trust proxy", true);
     app.use(coockieParser())
     await dbConnect();
     app.use(express.json());

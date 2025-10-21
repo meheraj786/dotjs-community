@@ -13,7 +13,7 @@ export const authMiddleware = async (
 ) => {
   try {
     const token = await req.cookies?.token;
-    console.log(req);
+
     if (!token) return res.status(401).json({ message: "Not authorized" });
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret") as {
       id: string;
