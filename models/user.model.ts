@@ -7,6 +7,9 @@ export interface IUser extends Document {
   email: string;
   password: string;
   avatar?: string;
+  bio?: string;
+  location?: string;
+  website?: string;
   followers: Types.ObjectId[];
   following: Types.ObjectId[];
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -40,6 +43,9 @@ const userSchema = new Schema<IUser>(
         default: [],
       },
     ],
+    bio: { type: String, trim: true },
+    location: { type: String, trim: true },
+    website: { type: String, trim: true },
   },
   { timestamps: true }
 );
