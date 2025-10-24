@@ -3,18 +3,23 @@ dotenv.config();
 import express, { Application } from "express";
 import routers from "./routes/index";
 import { dbConnect } from "./database/db.config";
-import coockieParser from "cookie-parser"
+import coockieParser from "cookie-parser";
+import cors from "cors";
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
 console.log();
 
-
-
 (async () => {
   try {
+    app.use(
+      cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+      })
+    );
     app.set("trust proxy", true);
-    app.use(coockieParser())
+    app.use(coockieParser());
     await dbConnect();
     app.use(express.json());
     app.use(routers);
