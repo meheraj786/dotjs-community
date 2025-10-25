@@ -104,3 +104,35 @@ export const likePost = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+export const checkIsLiked = async (req: AuthRequest, res: Response) => {
+  try {
+    const postId = req.params.id;
+    const currentUserId = req.user!._id;
+
+    const post = (await Post.findById(postId)) as IPost;
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    const isLiked = post.likes.some((id) =>
+      (id as Types.ObjectId).equals(currentUserId)
+    );
+
+    res.json({ isLiked });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const likesCount = async (req: AuthRequest, res: Response) => {
+  try {
+    const postId = req.params.id;
+
+    const post = (await Post.findById(postId)) as IPost;
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    
+    res.json({ likesCount: post.likes.length });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
