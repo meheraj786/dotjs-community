@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import User, { IUser } from "../models/user.model";
 import { Types } from "mongoose";
-import { log } from "node:console";
 
 interface AuthRequest extends Request {
   user?: IUser & { _id: Types.ObjectId };
@@ -186,4 +185,11 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
     console.error("Update error:", err);
     res.status(500).json({ message: "Server error" });
   }
+};
+export const getUser = async (req: AuthRequest, res: Response) => {
+  const id = req.user?._id;
+  const user = await User.findOne({ _id: id });
+  res.json({
+    data: user,
+  });
 };
