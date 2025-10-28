@@ -29,8 +29,7 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 };
 
 export const getPosts = async (req: AuthRequest, res: Response) => {
-  console.log(req.ip);
-  
+
   try {
     const currentUser = req.user!;
     const type = req.query.type as string;
@@ -41,17 +40,20 @@ export const getPosts = async (req: AuthRequest, res: Response) => {
     if (type === "following") {
       matchCondition = { author: { $in: followingIds } };
     } else {
-      matchCondition = {}; 
+      matchCondition = {};
     }
 
     const posts = await Post.aggregate([
       { $match: matchCondition },
       { $addFields: { likesCount: { $size: "$likes" } } },
-      { $sort: { likesCount: -1, createdAt: -1 } },
+      { $sort: { createdAt: -1 } },
       { $limit: 50 },
     ]);
 
-    await Post.populate(posts, { path: "author", select: "name avatar" });
+    await Post.populate(posts, [
+      { path: "author", select: "name avatar" },
+      { path: "comments", select: "content author avatar" },
+    ]);
 
     res.json(posts);
   } catch (err) {
@@ -129,7 +131,7 @@ export const likesCount = async (req: AuthRequest, res: Response) => {
 
     const post = (await Post.findById(postId)) as IPost;
     if (!post) return res.status(404).json({ message: "Post not found" });
-    
+
     res.json({ likesCount: post.likes.length });
   } catch (err) {
     console.error(err);
