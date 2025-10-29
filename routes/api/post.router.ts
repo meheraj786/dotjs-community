@@ -5,6 +5,7 @@ import {
   createPost,
   getPost,
   getPosts,
+  getTrendingTopics,
   likePost,
   likesCount,
 } from "../../controllers/post.controller";
@@ -17,5 +18,7 @@ postRoutes.get("/post/:id", getPost);
 postRoutes.post("/like/:id", authMiddleware, likePost);
 postRoutes.get("/is-liked/:id", authMiddleware, checkIsLiked);
 postRoutes.get("/likes-count/:id", likesCount);
+postRoutes.get("/trending-topics", getTrendingTopics);
+postRoutes.get("/tag/:tag", getTrendingTopics);
 
 export default postRoutes;

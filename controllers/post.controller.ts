@@ -29,7 +29,6 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 };
 
 export const getPosts = async (req: AuthRequest, res: Response) => {
-
   try {
     const currentUser = req.user!;
     const type = req.query.type as string;
@@ -49,10 +48,12 @@ export const getPosts = async (req: AuthRequest, res: Response) => {
       { $sort: { createdAt: -1 } },
       { $limit: 50 },
     ]);
-
     await Post.populate(posts, [
       { path: "author", select: "name avatar" },
-      { path: "comments", select: "content author avatar" },
+      {
+        path: "comments",
+        populate: { path: "author", select: "name avatar" },
+      },
     ]);
 
     res.json(posts);
@@ -133,6 +134,87 @@ export const likesCount = async (req: AuthRequest, res: Response) => {
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     res.json({ likesCount: post.likes.length });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getTrendingTopics = async (req: AuthRequest, res: Response) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 10;
+    const days = parseInt(req.query.days as string) || 7;
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const trendingTopics = await Post.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate },
+          tags: { $exists: true, $ne: [] },
+        },
+      },
+      { $unwind: "$tags" },
+      {
+        $group: {
+          _id: "$tags",
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+      { $limit: limit },
+      {
+        $project: {
+          _id: 0,
+          tag: "$_id",
+          postsCount: "$count",
+        },
+      },
+    ]);
+
+    res.json(trendingTopics);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getPostsByTag = async (req: AuthRequest, res: Response) => {
+  try {
+    const tag = req.params.tag;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const skip = (page - 1) * limit;
+
+    const posts = await Post.aggregate([
+      {
+        $match: {
+          tags: tag,
+        },
+      },
+      { $addFields: { likesCount: { $size: "$likes" } } },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+
+    const totalCount = await Post.countDocuments({ tags: tag });
+
+    await Post.populate(posts, [
+      { path: "author", select: "name username avatar verified" },
+      { path: "comments", select: "content author createdAt" },
+    ]);
+
+    res.json({
+      posts,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+        totalPosts: totalCount,
+        hasMore: skip + posts.length < totalCount,
+      },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });

@@ -87,7 +87,6 @@ export const deleteComment = async (req: AuthRequest, res: Response) => {
     const comment = (await Comment.findById(commentId)) as IComment;
     if (!comment) return res.status(404).json({ message: "Comment not found" });
 
-    // Fix 2️⃣: author assertion
     if (!(comment.author as Types.ObjectId).equals(currentUserId)) {
       return res.status(403).json({ message: "Unauthorized" });
     }
@@ -96,7 +95,6 @@ export const deleteComment = async (req: AuthRequest, res: Response) => {
       $pull: { comments: comment._id },
     });
 
-    // Fix 3️⃣: use deleteOne instead of remove
     await comment.deleteOne();
 
     res.json({ message: "Comment deleted successfully" });
