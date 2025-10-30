@@ -5,6 +5,7 @@ import {
   createPost,
   getPost,
   getPosts,
+  getPostsByTag,
   getTrendingTopics,
   likePost,
   likesCount,
@@ -19,6 +20,6 @@ postRoutes.post("/like/:id", authMiddleware, likePost);
 postRoutes.get("/is-liked/:id", authMiddleware, checkIsLiked);
 postRoutes.get("/likes-count/:id", likesCount);
 postRoutes.get("/trending-topics", getTrendingTopics);
-postRoutes.get("/tag/:tag", getTrendingTopics);
+postRoutes.get("/tag/:tag", getPostsByTag);
 
 export default postRoutes;
