@@ -10,10 +10,11 @@ import {
   likePost,
   likesCount,
 } from "../../controllers/post.controller";
+import { upload } from "../../middleware/multer.middleware";
 
 const postRoutes: Router = express.Router();
 
-postRoutes.post("/create", authMiddleware, createPost);
+postRoutes.post("/create", authMiddleware, upload.single("image"), createPost);
 postRoutes.get("/posts", getPosts);
 postRoutes.get("/post/:id", getPost);
 postRoutes.post("/like/:id", authMiddleware, likePost);

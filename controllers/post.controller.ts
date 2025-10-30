@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Types } from "mongoose";
 import Post, { IPost } from "../models/post.model";
+import uploadOnCloudinary from "../utils/cloudinary";
 
 interface AuthRequest extends Request {
   user?: { _id: Types.ObjectId; following: Types.ObjectId[] };
@@ -8,23 +9,40 @@ interface AuthRequest extends Request {
 
 export const createPost = async (req: AuthRequest, res: Response) => {
   try {
-    const { type, content, codeBlock, tags, image } = req.body;
+    const { type, content, codeBlock, tags } = req.body;
     const author = req.user!._id;
+
+    let imageUrl = "";
+
+    if (req.file?.path) {
+      const uploadResult = await uploadOnCloudinary(req.file.path);
+      if (!uploadResult) {
+        return res.status(500).json({ message: "Image upload failed" });
+      }
+      imageUrl = uploadResult.secure_url;
+    }
+
+    const parsedTags = typeof tags === "string" ? JSON.parse(tags) : tags || [];
 
     const post = new Post({
       type,
       content,
       codeBlock,
-      tags,
-      image,
+      tags: parsedTags,
+      image: imageUrl || null,
       author,
     });
 
     await post.save();
-    res.status(201).json(post);
+
+    res.status(201).json({
+      success: true,
+      message: "Post created successfully",
+      post,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error creating post:", err);
+    res.status(500).json({ message: "Server error while creating post" });
   }
 };
 
