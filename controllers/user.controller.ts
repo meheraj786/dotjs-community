@@ -193,3 +193,9 @@ export const getUser = async (req: AuthRequest, res: Response) => {
     data: user,
   });
 };
+export const getAllUser = async (req: AuthRequest, res: Response) => {
+  const users = await User.find({}).select("-password");
+  res.json({
+    data: users,
+  });
+};
