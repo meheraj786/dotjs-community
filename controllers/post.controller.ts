@@ -7,6 +7,7 @@ interface AuthRequest extends Request {
   user?: { _id: Types.ObjectId; following: Types.ObjectId[] };
 }
 
+
 export const createPost = async (req: AuthRequest, res: Response) => {
   try {
     const { type, content, codeBlock, tags } = req.body;
