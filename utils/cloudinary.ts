@@ -12,11 +12,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-/**
- * Upload a local file to Cloudinary and delete it locally afterwards
- * @param localFilePath - Path to the local file
- * @returns Cloudinary upload result or null if failed
- */
 const uploadOnCloudinary = async (
   localFilePath: string
 ): Promise<UploadApiResponse | null> => {
