@@ -8,6 +8,7 @@ const storage: StorageEngine = multer.diskStorage({
     cb(null, path.join(__dirname, "../public/temp"));
   },
 
+
   // Define how file name will be saved
   filename: (req, file, cb) => {
     cb(null, file.originalname); // Keep original name
